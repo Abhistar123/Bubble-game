@@ -5,6 +5,11 @@ var hitrandom=0;
 function increaseScore(){
     Score +=10;
     document.querySelector("#scorevalue").textContent=Score;
+    
+}
+function decreaseScore(){
+    Score -= 5;
+    document.querySelector("#scorevalue").textContent=Score;
 }
 
 function getNewHit(){
@@ -41,6 +46,10 @@ document.querySelector("#pbtm").addEventListener("click",function(details){ /*sa
         increaseScore();
         makeBubble();
         getNewHit();
+    }else if(clickednum!==hitrandom){
+          decreaseScore();
+          makeBubble();
+          getNewHit();
     }
 });
 runtimer();
