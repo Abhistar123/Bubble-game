@@ -1,57 +1,112 @@
-var timer=60;
-var Score=0;
-var hitrandom=0;
+let timer = 60;
+let Score = 0;
+let hitrandom = 0;
+let intervalId;
+let pbtm = document.querySelector("#pbtm");
 
-function increaseScore(){
-    Score +=10;
-    document.querySelector("#scorevalue").textContent=Score;
-    
+// Show Start button initially
+function showStartScreen() {
+    pbtm.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
+            <button id="startBtn">Start Game</button>
+        </div>
+    `;
+
+    document.querySelector("#startBtn").addEventListener("click", startGame);
 }
-function decreaseScore(){
+
+// Score display
+function updateScore() {
+    document.querySelector("#scorevalue").textContent = Score;
+}
+
+function increaseScore() {
+    Score += 10;
+    updateScore();
+}
+
+function decreaseScore() {
     Score -= 5;
-    document.querySelector("#scorevalue").textContent=Score;
+    updateScore();
 }
 
-function getNewHit(){
-    hitrandom=Math.floor(Math.random()*10);
-    document.querySelector("#hitvalue").textContent=hitrandom;
+function getNewHit() {
+    hitrandom = Math.floor(Math.random() * 10);
+    document.querySelector("#hitvalue").textContent = hitrandom;
 }
-function makeBubble(){
-    var Clutter="";
 
-   for(var i=0;i<=143;i++){
-       var random_num=Math.floor(Math.random()*10); /*math.random given between 0 and 1 in point then multiply by 10 to get between 0 and 10 in decimal after removing point values with math.floor    */
-       Clutter +=`<div class="bubble">${random_num}</div>`;
+function makeBubble() {
+    let Clutter = "";
+    for (let i = 0; i <= 143; i++) {
+        let random_num = Math.floor(Math.random() * 10);
+        Clutter += `<div class="bubble">${random_num}</div>`;
     }
-   document.querySelector("#pbtm").innerHTML=Clutter;
+    pbtm.innerHTML = Clutter;
 }
 
-function runtimer(){
-   var timerint= setInterval(function(){
-        if(timer>0){
-            timer--;  /*har ek second me funtion ka likha huaa code chelaga....means 1 second ke baad timer gatega...*/
-            document.querySelector("#timervalue").textContent=timer; /*timer ghatega toh new value paste ho jayega */
-        }else{
-            clearInterval(timerint);/* extra time else part me chalega minus me so usko clear karna hoga */
-            document.querySelector("#pbtm").innerHTML=`<h1 id="hello"> Game Over </h1> `;  /*remove all bubble after timer complete ----> because sare bubbles pbtm me hain */
+function updateTimer() {
+    document.querySelector("#timervalue").textContent = timer;
+}
+
+function runtimer() {
+    timer = 60;
+    updateTimer();
+
+    clearInterval(intervalId);
+    intervalId = setInterval(function () {
+        if (timer > 0) {
+            timer--;
+            updateTimer();
+        } else {
+            clearInterval(intervalId);
+            pbtm.innerHTML = `
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
+                    <h1 id="hello">Game Over : ${Score}</h1>
+                    <button id="restartBtn">Restart</button>
+                </div>
+            `;
+            document.querySelector("#restartBtn").addEventListener("click", startGame);
         }
-        
-    },1000);
+    }, 1000);
 }
 
-document.querySelector("#pbtm").addEventListener("click",function(details){ /*sare bubble pr events na lagane ke wajh hum pbtm pr laga denge ---> target se pata chlata hain ki event kon se bubble pr click use hain --->
-    textcontent se target div ke andar ka text lenge jo (String me hain)----> phir usko number me convet krenge then clickednum me store kr denge  */
-    var clickednum=Number(details.target.textContent);
-    if(clickednum===hitrandom){
-        increaseScore();
-        makeBubble();
-        getNewHit();
-    }else if(clickednum!==hitrandom){
-          decreaseScore();
-          makeBubble();
-          getNewHit();
-    }
-});
-runtimer();
-makeBubble();
-getNewHit();
+function startGame() {
+    Score = 0;
+    timer = 60;
+    updateScore();
+    updateTimer();
+    makeBubble();
+    getNewHit();
+    runtimer();
+
+    // Remove old event listener and add new one
+    let newPbtm = pbtm.cloneNode(true);
+    pbtm.parentNode.replaceChild(newPbtm, pbtm);
+    pbtm = newPbtm;
+
+    pbtm.addEventListener("click", function (details) {
+        let clickednum = Number(details.target.textContent);
+        if (!isNaN(clickednum)) {
+            if (clickednum === hitrandom) {
+                increaseScore();
+            } else {
+                decreaseScore();
+            }
+            makeBubble();
+            getNewHit();
+        }
+    });
+}
+
+// Show start button on page load
+showStartScreen();
+
+
+
+
+
+
+
+
+
+
